@@ -13,7 +13,7 @@ Home page
 ![Home page](https://github.com/malliva/malliva/blob/master/screenshot_home.png)
 
 ## Setup
-
+test
 TODO: To be reorganized
 
 Run 
