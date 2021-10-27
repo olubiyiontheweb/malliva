@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styles from './app.module.scss';
-import { Route, Switch, Redirect, useLocation } from 'react-router-dom';
+import {
+  Route,
+  Switch,
+  Redirect,
+  useLocation,
+  useParams,
+} from 'react-router-dom';
 
 import { MarketAppLandingPage } from 'libs/market-app/landing-page/src/index';
 import {
@@ -13,6 +19,7 @@ import { SharedAuthGuard } from 'libs/shared/auth-guard/src/index';
 import { MarketAppDashboard } from 'libs/market-app/dashboard/src/index';
 import { MarketAppTopMenu } from '@client/market-app/top-menu';
 import { MarketAppSignOuts } from 'libs/market-app/sign-outs/src/index';
+import { MarketAppCreateListing } from 'libs/market-app/create-listing/src/index';
 import { useSelector } from 'react-redux';
 
 const menu = [
@@ -27,21 +34,7 @@ const menu = [
 export interface MarketAppProps {}
 
 export function App(props: MarketAppProps) {
-  const [isLogin, setIsLogin] = useState(false);
-  const [routeLink, setRouteLink] = useState('');
-  const { response } = useSelector(selectSignInStateLoaded);
-
-  useEffect(() => {
-    //check for admin right/privileges
-    if (Object.entries(response).length > 0) {
-      setIsLogin(true);
-      setRouteLink('/dashboard/index');
-    } else {
-      setIsLogin(false);
-      setRouteLink('/');
-    }
-  }, [response]);
-
+  const { isLogin } = useSelector(selectSignInStateLoaded);
   return (
     <Switch>
       <Route path="/sign-in">
@@ -49,7 +42,6 @@ export function App(props: MarketAppProps) {
       </Route>
 
       <Route path="/sign-out">
-        <MarketAppTopMenu menu={menu} />
         <MarketAppSignOuts />
       </Route>
 
@@ -60,6 +52,11 @@ export function App(props: MarketAppProps) {
       <Route path="/item-id">
         <MarketAppTopMenu menu={menu} />
         <MarketAppItemDetails />
+      </Route>
+
+      <Route exact path="/create-listing">
+        <MarketAppTopMenu menu={menu} />
+        <MarketAppCreateListing />
       </Route>
 
       <SharedAuthGuard
@@ -73,7 +70,7 @@ export function App(props: MarketAppProps) {
         <MarketAppLandingPage />
       </Route>
 
-      <Redirect to={routeLink} />
+      <Redirect to={'/'} />
     </Switch>
   );
 }

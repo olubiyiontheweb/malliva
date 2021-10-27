@@ -14,8 +14,17 @@ export interface SignUpState {
   username: string;
   email: string;
   password: string;
-  // password_confirm: string;
   terms_of_service_accepted: boolean;
+}
+
+export interface CreateListingState {
+  title: string;
+  price: number | string;
+  posted_by: string;
+  category: string;
+  description: string;
+  listing_images: Array<string>;
+  visible: boolean;
 }
 
 export interface SignInState {
@@ -98,30 +107,23 @@ export const getRegisteredUsers = createAsyncThunk(
   }
 );
 
-export const setCookieForUsers = (key, name, value) => {
-  if (key === 'edit') {
-    document.cookie + '=' + value;
+export const postCreateListing = createAsyncThunk(
+  'malliva/create-listing',
+  async (payload: CreateListingState, thunkApi) => {
+    try {
+      //Update post url
+      const formData = JSON.stringify(payload);
+      const response = await axios.post(
+        API_URL + 'api/v1/auth/logout',
+        formData,
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      const data = await response.data;
+      return { data };
+    } catch (error) {
+      return thunkApi.rejectWithValue({ error: error.message });
+    }
   }
-  if (document.cookie[name] === undefined && key == 'create') {
-    //Remove existing cookie for theme.
-    //set the expiration 1 day before the current day/time
-    const date = new Date(Date.now() - 3600 * 1000 * 24);
-    const expires = 'expires=' + date.toUTCString();
-    document.cookie = [name] + '=' + '' + ';path=/;' + expires;
-    //Add a new  cookie for theme.
-    document.cookie = name + '=' + value;
-  }
-};
-
-export const getCookieForUsers = (name) => {
-  const nameEQ = name + '=';
-  const ca = document.cookie.split(';');
-
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-  }
-
-  return null;
-};
+);
